@@ -1,0 +1,254 @@
+import java.util.*;
+
+public class Keno
+{
+	static Scanner sc = new Scanner(System.in); 
+    
+    static int numberofmatches; 
+    static double wager = 0; 
+    
+    public static void main(String[] args)
+    {
+        double total = 100; 
+        boolean goodinput = true;
+        boolean goodinput1 = true;
+        int playAgain = 0;
+         
+        do
+        {
+        	if(total <= 0)
+        	{
+        		System.out.println("You have no money! Better luck next time! ");
+        		break;
+        	}
+        
+
+        	int[] player = new int[7]; 
+        	int[] computer = new int[20];
+         
+        	System.out.println("Welcome to Keno!");
+        	double bet = 0;
+        	do
+        	{
+        		try
+        		{
+        		
+        			System.out.println("You have " + total + " dollars. How much would you like to bet?: ");
+        			bet = sc.nextDouble();
+                
+        			if(bet < 0 || bet > total)
+        			{
+        				throw new InputMismatchException();
+        			}
+        			
+        			else
+        			{
+        				goodinput1 = true;
+        			}
+                
+        		}
+            
+        		catch(InputMismatchException e)
+        		{
+        			
+        			System.out.println("ERROR: Enter valid bet amount");
+        			goodinput1 = false;
+        		}
+        	}while(!goodinput1);
+        
+        	System.out.println("Enter numbers between 1 and 80");
+        
+        	wager= bet; 
+        	
+        	fillPlayerArray(player);
+        	
+        	
+        	System.out.print("Here are your numbers: ");
+        
+        	printArray(player);
+        	
+        	fillComputerArray(computer);
+        
+        	System.out.print("Here are the computer's numbers: ");
+        	printArray(computer);
+        	numberOfMatches(player, computer); 
+        	double wintotal = wins(numberofmatches, wager); 
+        	
+        	do{
+        		try
+            	{
+            		System.out.println("Would you like to play again (1) or quit (2)? ");
+                	playAgain = sc.nextInt(); 
+                	if(playAgain != 1 && playAgain != 2)
+                	{
+                		throw new InputMismatchException();
+                	}
+                	else
+                	{
+                		goodinput = true;
+                	}
+            	}
+            	
+            	catch(InputMismatchException e)
+            	{
+            		System.out.println("ERROR: Please enter 1 or 2");
+            		goodinput = false;
+            	}
+            	
+        	}while(!goodinput);
+        	
+        	
+        	total = setAmount(wager, wintotal, numberofmatches, total);
+        
+        }while(playAgain == 1);
+        
+        
+    }
+    
+    public static void fillPlayerArray(int[] player)
+    {
+    	boolean Unique = false; 
+        int count = 0; 
+        
+    	for(int i = 0; i < player.length; i++)
+    	{
+         
+    		do
+    		{
+    			System.out.println("Enter #"+(i+1));
+    			player[i] = sc.nextInt();
+    			count = 0; 
+    			for(int j = 0; j < player.length; j++)
+    			{
+    				if(player[i] == player[j])
+    				{
+    					count++; 
+    				}
+    					
+    			}
+    			
+    			if(count > 1)
+    			{
+    				Unique = false;
+    				System.out.println("ERROR: You've used this number already!");
+    			}
+    			else
+    			{
+    				Unique = true;
+    			}
+    			if(player[i] < 1 || player[i] > 80)
+    			{
+    				System.out.println("ERROR: Please enter a number between 1 and 80!");
+    			}
+                 
+    		}while((player[i] < 1 || player[i] > 80 )|| Unique == false); 
+    		
+    	}
+    }
+    
+    public static void fillComputerArray(int[] computer)
+    {
+    	int count2 =0;  
+    	for(int i = 0; i < computer.length; i++)
+    	{
+    		do
+    		{
+    			count2 = 0; 
+    			int random = (int)(Math.random() * 80) + 1; 
+    			computer[i] = random; 
+    			for(int j = 0; j < computer.length; j++)
+    			{
+    				if(computer[i] == computer[j])
+    				{
+    					count2++; 
+    				}
+    			}
+    			
+    		}while(count2 >1); 
+        
+    	}
+    }
+    
+            
+    public static void printArray(int[] numbers)
+    {
+		
+		for(int i = 0; i < numbers.length - 1; i++)
+		{
+			System.out.print(numbers[i] + ",");
+		}
+			
+		
+		System.out.println(numbers[numbers.length - 1]);
+		
+		
+	}
+    
+    public static int numberOfMatches(int[] player, int[] computer)
+    {
+        int matchcount = 0; 
+         
+        for(int i = 0; i < player.length; i++)
+        {
+            for(int j = 0; j < computer.length; j++)
+            {
+                if(player[i] == computer[j])
+                {
+                    matchcount++; 
+                }
+            }
+        }
+        numberofmatches = matchcount;
+            
+        return matchcount; 
+    }
+    
+    public static double wins(int matchcount, double bet)
+    {
+        double wintotal = 0; 
+        if(matchcount == 0 || matchcount == 1 || matchcount == 2 || matchcount == 3)
+        {
+            wintotal = 0; 
+        }
+        else if(matchcount == 4)
+        {
+            wintotal = 1*bet; 
+        }
+        else if(matchcount == 5)
+        {
+        	wintotal = 20*bet; 
+        }
+        else if(matchcount == 6)
+        {
+        	wintotal = 200*bet; 
+        }
+            
+        else if(matchcount == 7)
+        {
+            wintotal = 12000*bet;
+        }
+        
+        System.out.println("You matched "+ matchcount+ " number/numbers, you win " +wintotal+" dollars.");
+        
+        return wintotal;
+        
+    }
+    
+    public static double setAmount(double bet, double amount, int matchcount, double total)
+    {
+    	
+    	
+    	if(matchcount < 4)
+    	{
+    		total = total - bet;
+    	}
+    	
+    	else
+    	{
+    		total = total - bet + amount;
+    	}
+    	
+    	return total;
+    		
+    }
+}
